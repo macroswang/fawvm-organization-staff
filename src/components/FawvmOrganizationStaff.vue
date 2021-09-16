@@ -13,7 +13,6 @@
       <a-transfer
         :data-source="tableDataSource"
         :target-keys="selectedRowKeys"
-        :row-key="record => record.email"
         :operations="['选中', '移除']"
         :filter-option="
           (inputValue, item) => item.title.indexOf(inputValue) !== -1
@@ -171,7 +170,7 @@ export default {
   .leftContainer {
     display: flex;
     float: left;
-    min-width: 300px;
+    min-width: 250px;
     max-height: 600px;
     overflow-x: hidden;
     border: 1px solid #e6f0fb;
