@@ -7,79 +7,60 @@
         :tree-data="treeDataSource"
         @select="onTreeSelect"
       >
-        <a-icon slot="icon" type="carry-out" />
-        <a-tree-node key="0-0">
-          <a-icon slot="icon" type="carry-out" />
-          <span slot="title" style="color: #1890ff">一汽-大众汽车有限公司</span>
-          <a-tree-node key="0-0-0" title="总经理系统">
-            <a-icon slot="icon" type="carry-out" />
-            <a-tree-node key="0-0-0-0" title="leaf">
-              <a-icon slot="icon" type="carry-out" />
-            </a-tree-node>
-            <a-tree-node key="0-0-0-1" title="leaf">
-              <a-icon slot="icon" type="carry-out" />
-            </a-tree-node>
-            <a-tree-node key="0-0-0-2" title="leaf">
-              <a-icon slot="icon" type="carry-out" />
-            </a-tree-node>
-          </a-tree-node>
-          <a-tree-node key="0-0-1" title="第一副总经理(财务)系统[F]">
-            <a-icon slot="icon" type="carry-out" />
-            <a-tree-node key="0-0-1-0" title="leaf">
-              <a-icon slot="icon" type="carry-out" />
-            </a-tree-node>
-          </a-tree-node>
-          <a-tree-node key="0-0-2" title="副总经理(人事)系统[H]">
-            <a-icon slot="icon" type="carry-out" />
-            <a-tree-node key="0-0-2-0" title="leaf">
-              <a-icon slot="icon" type="carry-out" />
-            </a-tree-node>
-            <a-tree-node key="0-0-2-1" title="leaf">
-              <a-icon slot="icon" type="carry-out" />
-              <a-icon slot="switcherIcon" type="form" />
-            </a-tree-node>
-          </a-tree-node>
-        </a-tree-node>
       </a-tree>
     </div>
     <div class="rightContainer">
-      <div class="top-right-container">
-        <div class="search">
-          <a-input
-            v-model="partNo"
-            style="width:250px"
-            placeholder="请输入姓名\工号\账号"
-          />
-          <a-button class="search-button" type="primary" @click="handleSearch"
-            >搜索</a-button
-          >
-        </div>
-        <div class="selectedConfirm">
-          <a-button class="search-button" type="primary" @click="handleSelected"
-            >确定选择</a-button
-          >
-        </div>
-      </div>
-
-      <a-table
-        :row-key="(record, index) => index"
-        :columns="tableColumns"
-        :row-selection="rowSelection"
+      <a-transfer
         :data-source="tableDataSource"
-        :pagination="pagination"
-        @change="paginationChange"
+        :target-keys="selectedRowKeys"
+        :row-key="record => record.email"
+        :operations="['选中', '移除']"
+        :filter-option="
+          (inputValue, item) => item.title.indexOf(inputValue) !== -1
+        "
+        :show-select-all="false"
+        @change="onChange"
       >
-      </a-table>
+        <template
+          slot="children"
+          slot-scope="{
+            props: { direction, filteredItems, selectedKeys },
+            on: { itemSelectAll, itemSelect }
+          }"
+        >
+          <a-table
+            :row-key="(record, index) => record.key"
+            :row-selection="
+              getRowSelection({
+                selectedKeys,
+                itemSelectAll,
+                itemSelect
+              })
+            "
+            :columns="
+              direction === 'left' ? tableLeftColumns : tableRightColumns
+            "
+            :data-source="filteredItems"
+            :size="tableSize"
+            @change="paginationChange"
+          />
+        </template>
+      </a-transfer>
+      <div class="selectedConfirm">
+        <a-button class="search-button" type="primary" @click="handleSelected"
+          >确定选择</a-button
+        >
+      </div>
     </div>
   </div>
 </template>
 <script>
+import difference from "lodash/difference";
+
 export default {
-  name: "FawvmOrganizationStaff",
   data() {
     return {
-      partNo: "",
-      selectedRows: []
+      selectedRowKeys: []
     };
   },
   props: {
@@ -95,7 +76,15 @@ export default {
       type: Array,
       default: () => []
     },
-    tableColumns: {
+    tableSize: {
+      type: String,
+      default: ""
+    },
+    tableLeftColumns: {
+      type: Array,
+      default: () => []
+    },
+    tableRightColumns: {
       type: Array,
       default: () => []
     },
@@ -107,9 +96,11 @@ export default {
       type: Boolean,
       default: true
     },
-    selectedRowKeys: {
+    targetKeys: {
       type: Array,
-      default: () => []
+      default: () => {
+        return [];
+      }
     },
     pagination: {
       type: Object,
@@ -130,39 +121,43 @@ export default {
       console.log("Watch>>>>>>>tableDataSource=", val);
     }
   },
-  computed: {
-    rowSelection() {
-      return this.hasRowSelection
-        ? {
-            onChange: this.onSelectChange,
-            getCheckboxProps: record => {
-              return {
-                props: {
-                  defaultChecked: this.selectedRowKeys.includes(record.id)
-                }
-              };
-            }
-          }
-        : null;
-    }
+  created() {
+    this.selectedRowKeys = [...this.targetKeys];
   },
   methods: {
     handleSearch() {
       this.$emit("handleSearch", this.partNo);
     },
     handleSelected() {
-      this.$emit("handleSelected", this.selectedRows);
+      this.$emit("handleSelected", this.selectedRowKeys);
     },
     onTreeSelect(selectedKeys, info) {
       this.$emit("onTreeSelect", selectedKeys, info);
     },
-    onSelectChange(selectedRowKeys, selectedRows) {
-      this.selectedRows = selectedRows;
-      this.$emit("onSelectChange", selectedRowKeys, selectedRows);
-    },
     paginationChange(e) {
       const { current } = e;
       this.$emit("paginationChange", current);
+    },
+    onChange(nextTargetKeys) {
+      this.selectedRowKeys = nextTargetKeys;
+    },
+    getRowSelection({ selectedKeys, itemSelectAll, itemSelect }) {
+      return {
+        // getCheckboxProps: item => ({
+        //   props: { disabled: disabled || item.disabled }
+        // }),
+        onSelectAll(selected, selectedRows) {
+          const treeSelectedKeys = selectedRows.map(({ key }) => key);
+          const diffKeys = selected
+            ? difference(treeSelectedKeys, selectedKeys)
+            : difference(selectedKeys, treeSelectedKeys);
+          itemSelectAll(diffKeys, selected);
+        },
+        onSelect({ key }, selected) {
+          itemSelect(key, selected);
+        },
+        selectedRowKeys: selectedKeys
+      };
     }
   }
 };
@@ -172,45 +167,39 @@ export default {
 .container {
   display: flex;
   justify-content: center;
-  padding: 20px;
-  min-height: 500px;
 
   .leftContainer {
     display: flex;
     float: left;
     min-width: 300px;
+    max-height: 600px;
+    overflow-x: hidden;
     border: 1px solid #e6f0fb;
     padding: 10px;
   }
-
   .rightContainer {
     display: flex;
+    flex: 1;
     flex-direction: column;
+    max-height: 600px;
+    overflow-x: hidden;
     border: 1px solid #e6f0fb;
-    padding: 10px;
+    padding: 5px;
+  }
 
-    .top-right-container {
-      display: flex;
-      padding: 10px;
+  .selectedConfirm {
+    display: flex;
+    flex: 1;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    justify-content: flex-end;
+  }
 
-      .search {
-        justify-content: flex-start;
-      }
-
-      .selectedConfirm {
-        display: flex;
-        flex: 1;
-        justify-content: flex-end;
-      }
-
-      .search-button {
-        margin-left: 5px;
-      }
-    }
-    // flex: 1;
-    // background: #f0ad4e;
+  .search-button {
+    margin-left: 5px;
   }
 }
+
 /deep/ .ant-tree li span.ant-tree-switcher {
   width: 16px;
   height: 16px;

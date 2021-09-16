@@ -1,7 +1,7 @@
 {
   "name": "fawvm-organization-staff",
   "description": "组织机构与人员管理前端UI",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "macroswang@gmail.com",
   "license": "MIT",
   "private": false,
@@ -22,33 +22,37 @@
     "not ie <= 8"
   ],
   "devDependencies": {
+    "ant-design-vue": "1.7.2",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-3": "^6.24.1",
-    "ant-design-vue": "1.7.2",
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
     "file-loader": "^1.1.4",
-    "vue-loader": "^13.0.5",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
+    "lodash": "^4.17.21",
+    "vue-loader": "^13.0.5",
     "vue-template-compiler": "^2.4.4",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.9.1"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macroswang/fawvm-organization-staff.git"
   },
   "bugs": {
-      "url": "https://github.com/macroswang/fawvm-organization-staff/issues"
+    "url": "https://github.com/macroswang/fawvm-organization-staff/issues"
   },
   "homepage": "https://github.com/macroswang/fawvm-organization-staff",
   "keywords": [
-      "fawvm",
-      "vue organization",
-      "organization",
-      "staff"
+    "fawvm",
+    "vue organization",
+    "organization",
+    "staff"
   ]
 }

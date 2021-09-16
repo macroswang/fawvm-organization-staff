@@ -4,42 +4,61 @@
       :tree-show-icon="true"
       :tree-show-line="false"
       :tree-data-source="treeDataSource"
-      :table-columns="tableClumns"
+      :table-size="'small'"
+      :table-left-columns="tableLeftColumns"
+      :table-right-columns="tableRightColumns"
+      :target-keys="targetKeys"
       :table-data-source="tableDataSource"
       @onTreeSelect="onTreeSelect"
       @handleSearch="handleSearch"
       @handleSelected="handleSelected"
       @onSelectChange="onSelectChange"
-      @paginationChang="paginationChange"
     />
   </div>
 </template>
 
 <script>
 import FawvmOrganizationStaff from "./components/FawvmOrganizationStaff";
-const tableClumns = [
+const tableLeftColumns = [
   {
     title: "姓名",
-    dataIndex: "name",
-    width: 120,
+    dataIndex: "title",
+    width: 100,
     align: "center"
   },
   {
     title: "邮箱",
     dataIndex: "email",
-    width: 220,
+    ellipsis: true,
+    width: 200,
     align: "center"
   },
   {
     title: "部门科室",
     dataIndex: "deptName",
+    ellipsis: true,
     width: 150,
     align: "center"
   },
   {
     title: "岗位名称",
     dataIndex: "vwdutyName",
+    ellipsis: true,
     width: 150,
+    align: "center"
+  }
+];
+const tableRightColumns = [
+  {
+    title: "姓名",
+    dataIndex: "title",
+    width: 120,
+    align: "center"
+  },
+  {
+    title: "部门科室",
+    dataIndex: "deptName",
+    width: 200,
     align: "center"
   }
 ];
@@ -168,30 +187,79 @@ const treeData = [
 ];
 const tableDataSource = [
   {
-    name: "王国科",
-    email: "macrwang@deloitte.com.cn",
+    title: "王国科1",
+    email: "macrwang1@deloitte.com.cn",
     deptName: "技术部",
     vwdutyName: "前端"
   },
   {
-    name: "李冬祥",
-    email: "dongxiang@deloitte.com.cn",
+    title: "李冬祥2",
+    email: "dongxiang2@deloitte.com.cn",
     deptName: "技术部",
     vwdutyName: "前端"
   },
   {
-    name: "秦晓昆",
-    email: "xiaokun@deloitte.com.cn",
+    title: "秦晓昆",
+    email: "xiaokun3@deloitte.com.cn",
     deptName: "技术部",
     vwdutyName: "后端"
   },
   {
-    name: "何川",
-    email: "hechuang@deloitte.com.cn",
+    title: "何川",
+    email: "hechuang4@deloitte.com.cn",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "王国科",
+    email: "macrwang5@deloitte.com.cn",
+    deptName: "技术部",
+    vwdutyName: "前端"
+  },
+  {
+    title: "李冬祥",
+    email: "dongxiang6@deloitte.com.cn",
+    deptName: "技术部",
+    vwdutyName: "前端"
+  },
+  {
+    title: "秦晓昆",
+    email: "xiaokun7@deloitte.com.cn",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "何川",
+    email: "hechuang8@deloitte.com.cn",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "王国科",
+    email: "macrwang9@deloitte.com.cn",
+    deptName: "技术部",
+    vwdutyName: "前端"
+  },
+  {
+    title: "李冬祥",
+    email: "dongxiang0@deloitte.com.cn",
+    deptName: "技术部",
+    vwdutyName: "前端"
+  },
+  {
+    title: "秦晓昆",
+    email: "xiaokun11@deloitte.com.cn",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "何川",
+    email: "hechuang12@deloitte.com.cn",
     deptName: "技术部",
     vwdutyName: "后端"
   }
 ];
+
 export default {
   name: "app",
   components: {
@@ -199,10 +267,11 @@ export default {
   },
   data() {
     return {
-      tableClumns,
+      targetKeys: [],
+      tableLeftColumns,
+      tableRightColumns,
       tableDataSource,
-      treeDataSource: treeData,
-      msg: "Welcome to Your Vue.js App"
+      treeDataSource: treeData
     };
   },
   created() {},
@@ -212,7 +281,7 @@ export default {
     },
     handleSelected(selectedRows) {
       if (selectedRows && selectedRows.length === 0) {
-        return this.$message.error("请选择行数据！");
+        return this.$message.error("请选择数据！");
       }
       console.log("确认表格中选择的内容:", selectedRows);
     },
@@ -240,22 +309,28 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-h1,
-h2 {
-  font-weight: normal;
+// 修改hover的背景颜色ant-table-tbody
+.ant-table-tbody {
+  > tr:hover:not(.ant-table-expanded-row) > td,
+  .ant-table-row-hover,
+  .ant-table-row-hover > td {
+    background: #e5f2ff !important;
+  }
 }
-
-ul {
-  list-style-type: none;
-  padding: 0;
+.ant-table-fixed {
+  .ant-table-row-hover,
+  .ant-table-row-hover > td {
+    background: #e5f2ff !important;
+  }
 }
-
-li {
-  display: inline-block;
-  margin: 0 10px;
+/deep/ .ant-table-tbody {
+  max-height: 540px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
-
-a {
-  color: #42b983;
+.ant-table-bordered .ant-table-thead > tr > th,
+.ant-table-bordered .ant-table-tbody > tr {
+  border-top: 0px solid #ffffff !important;
+  border: 0px solid #fff;
 }
 </style>
