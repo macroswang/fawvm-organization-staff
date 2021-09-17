@@ -1,50 +1,59 @@
 <template>
   <div id="app">
-    <FawvmOrganizationStaff
-      :tree-show-icon="true"
-      :tree-show-line="false"
-      :tree-data-source="treeDataSource"
-      :table-size="'small'"
-      :table-left-columns="tableLeftColumns"
-      :table-right-columns="tableRightColumns"
-      :target-keys="targetKeys"
-      :table-data-source="tableDataSource"
-      @onTreeSelect="onTreeSelect"
-      @handleSearch="handleSearch"
-      @handleSelected="handleSelected"
-      @onSelectChange="onSelectChange"
+    人员选择<a-input
+      v-model="receiver"
+      :disabled="false"
+      placeholder="请输入"
+      @click="handleOrganizationVisible"
     />
+    <!-- 选择人员 -->
+    <Modal :visible.sync="organizationVisible" contentStyle="width: 96%;">
+      <FawvmOrganizationStaff
+        :tree-show-icon="true"
+        :tree-show-line="false"
+        :tree-data-source="treeDataSource"
+        :table-size="'small'"
+        :tree-current-key="treeCurrentKey"
+        :table-left-columns="tableLeftColumns"
+        :table-right-columns="tableRightColumns"
+        :target-keys="targetKeys"
+        :table-data-source="tableDataSource"
+        @onTreeSelect="onTreeSelect"
+        @handleSearch="handleSearch"
+        @handleSelected="handleSelected"
+        @onSelectChange="onSelectChange"
+        @handleReset="handleReset"
+      />
+    </Modal>
   </div>
 </template>
 
 <script>
+import Modal from "./components/Modal";
 import FawvmOrganizationStaff from "./components/FawvmOrganizationStaff";
 const tableLeftColumns = [
   {
     title: "姓名",
     dataIndex: "title",
-    width: 100,
+    ellipsis: true,
     align: "center"
   },
   {
     title: "邮箱",
     dataIndex: "email",
     ellipsis: true,
-    width: 200,
     align: "center"
   },
   {
     title: "部门科室",
     dataIndex: "deptName",
     ellipsis: true,
-    width: 150,
     align: "center"
   },
   {
     title: "岗位名称",
     dataIndex: "vwdutyName",
     ellipsis: true,
-    width: 150,
     align: "center"
   }
 ];
@@ -52,13 +61,19 @@ const tableRightColumns = [
   {
     title: "姓名",
     dataIndex: "title",
-    width: 120,
+    ellipsis: true,
+    align: "center"
+  },
+  {
+    title: "邮箱",
+    dataIndex: "email",
+    ellipsis: true,
     align: "center"
   },
   {
     title: "部门科室",
     dataIndex: "deptName",
-    width: 200,
+    ellipsis: true,
     align: "center"
   }
 ];
@@ -348,14 +363,20 @@ const tableDataSource2 = [
 export default {
   name: "app",
   components: {
+    Modal,
     FawvmOrganizationStaff
   },
   data() {
     return {
+      receiver: "",
+      receivers: [],
       targetKeys: [],
+      selectedRows: [],
+      treeCurrentKey: "",
       tableLeftColumns,
       tableRightColumns,
-      tableDataSource: tableDataSource1,
+      tableDataSource: [],
+      organizationVisible: false, // 人员树
       treeDataSource: treeData
     };
   },
@@ -364,20 +385,38 @@ export default {
     handleSearch(val) {
       console.log("搜索的内容:", val);
     },
-    handleSelected(selectedRows) {
-      if (selectedRows && selectedRows.length === 0) {
-        return this.$message.error("请选择数据！");
+    handleReset() {
+      this.receiver = "";
+      this.targetKeys = [];
+      this.selectedRows = [];
+    },
+    handleSelected(allSelectedRows) {
+      if (allSelectedRows && allSelectedRows.length === 0) {
+        return this.$message.error("请选择行数据！");
       }
-      console.log("确认表格中选择的内容:", selectedRows);
-      this.targetKeys = [...selectedRows];
+      console.log("allSelectedRows=>", allSelectedRows);
+      this.receiver = "";
+      this.receivers = [];
+      this.selectedRows = [];
+      allSelectedRows.forEach(item => {
+        let obj = {};
+        obj.email = item.email;
+        obj.userId = item.gid;
+        obj.userName = item.name;
+        this.receivers.push(obj);
+        this.selectedRows.push(item);
+      });
+      this.receiver = this.receivers.map(item => item.userName).join(",");
+      this.organizationVisible = false;
+      this.targetKeys = [];
     },
     onSelectChange(selectedRow, selectedRowKey) {
       console.log("当前点击选择的内容:", selectedRow, selectedRowKey);
     },
     // 菜单选择
     onTreeSelect(selectedKeys, info) {
-      console.log("selected", selectedKeys, info);
-
+      // console.log("selected", selectedKeys, info);
+      this.treeCurrentKey = selectedKeys[0];
       if (selectedKeys[0] === "0-0-0-1") {
         this.tableDataSource = tableDataSource1;
       } else if (selectedKeys[0] === "0-0-0-2") {
@@ -387,6 +426,12 @@ export default {
     },
     paginationChange(e) {
       console.log("分页的内容:", e);
+    },
+    handleOrganizationVisible() {
+      this.organizationVisible = true;
+      this.tableDataSource = [];
+      this.treeCurrentKey = "";
+      this.targetKeys = [...this.selectedRows];
     }
   }
 };

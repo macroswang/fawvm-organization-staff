@@ -11,7 +11,7 @@
     </div>
     <div class="rightContainer">
       <a-transfer
-        :data-source="tableDataSource"
+        :data-source="wapperTableDataSource"
         :target-keys="selectedRowKeys"
         :operations="['选中', '移除']"
         :filter-option="
@@ -46,6 +46,7 @@
         </template>
       </a-transfer>
       <div class="selectedConfirm">
+        <a-button class="search-button" @click="handleReset">重置</a-button>
         <a-button class="search-button" type="primary" @click="handleSelected"
           >确定选择</a-button
         >
@@ -61,6 +62,8 @@ export default {
     return {
       tempRowData: [],
       selectedRow: [],
+      mapSelectedData: null,
+      wapperTableDataSource: [],
       selectedRowKeys: []
     };
   },
@@ -72,6 +75,10 @@ export default {
     treeShowLine: {
       type: Boolean,
       default: true
+    },
+    treeCurrentKey: {
+      type: String,
+      default: ""
     },
     treeDataSource: {
       type: Array,
@@ -99,9 +106,7 @@ export default {
     },
     targetKeys: {
       type: Array,
-      default: () => {
-        return [];
-      }
+      default: () => []
     },
     pagination: {
       type: Object,
@@ -119,26 +124,54 @@ export default {
   },
   watch: {
     tableDataSource(val) {
-      this.tableDataSource = val;
+      this.wapperTableDataSource = val.map(item => {
+        return Object.assign(item, { pid: this.treeCurrentKey });
+      });
+    },
+    treeCurrentKey(val) {
+      this.treeCurrentKey = val;
+      this.initData();
     }
   },
   created() {
-    this.tempRowData = [];
-    this.selectedRowKeys = [...this.targetKeys];
+    this.tempRowData = [...this.targetKeys];
+    this.initData();
   },
   methods: {
+    initData() {
+      if (this.tableDataSource) {
+        this.wapperTableDataSource = this.tableDataSource.map(item => {
+          return Object.assign(item, { pid: this.treeCurrentKey });
+        });
+        this.targetKeys &&
+          this.targetKeys.map(item => {
+            if (item.pid === this.treeCurrentKey) {
+              this.selectedRowKeys.push(item.key);
+            }
+          });
+      }
+    },
     handleSearch() {
       this.$emit("handleSearch", this.partNo);
+    },
+    handleReset() {
+      this.selectedRow = [];
+      this.tempRowData = [];
+      this.selectedRowKeys = [];
+      this.$emit("handleReset");
     },
     handleSelected() {
       this.selectedRow = [];
       this.selectedRowKeys.map(val => {
         this.tempRowData.some(item => {
-          if (val === item.key) {
+          if (val === item.key && !this.selectedRow.includes(item)) {
             return this.selectedRow.push(item);
           }
         });
       });
+      if (this.selectedRow.length === 0) {
+        this.selectedRow = [...this.tempRowData];
+      }
       this.$emit("handleSelected", this.selectedRow);
     },
     onTreeSelect(selectedKeys, info) {
@@ -151,11 +184,9 @@ export default {
     onChange(nextTargetKeys) {
       this.selectedRowKeys = nextTargetKeys;
       nextTargetKeys.map(val => {
-        this.tableDataSource.some(item => {
-          if (val === item.key) {
-            if (!this.tempRowData.includes(item)) {
-              return this.tempRowData.push(item);
-            }
+        this.wapperTableDataSource.some(item => {
+          if (val === item.key && !this.tempRowData.includes(item)) {
+            return this.tempRowData.push(item);
           }
         });
       });
@@ -190,7 +221,7 @@ export default {
   .leftContainer {
     display: flex;
     float: left;
-    min-width: 250px;
+    min-width: 280px;
     max-height: 600px;
     overflow-x: hidden;
     border: 1px solid #e6f0fb;
