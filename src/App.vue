@@ -185,7 +185,7 @@ const treeData = [
     ]
   }
 ];
-const tableDataSource = [
+const tableDataSource1 = [
   {
     title: "小王",
     key: "macrwang1@xxx.com",
@@ -265,6 +265,86 @@ const tableDataSource = [
   }
 ];
 
+const tableDataSource2 = [
+  {
+    title: "小王1",
+    key: "macrwang1@axxx.com",
+    email: "macrwang1@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "前端"
+  },
+  {
+    title: "小李2",
+    key: "xiaoli@axxx.com",
+    email: "xiaoli@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "前端"
+  },
+  {
+    title: "小秦3",
+    key: "xiaoqin@axxx.com",
+    email: "xiaoqin@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "小何4",
+    key: "hexiao4@axxx.com",
+    email: "hexiao4@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "小周5",
+    key: "zhouxiao@axxx.com",
+    email: "zhouxiao@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "小张6",
+    key: "zhangxiao@axxx.com",
+    email: "zhangxiao@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "小杨7",
+    key: "yangxiao@axxx.com",
+    email: "yangxiao@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "前端"
+  },
+  {
+    title: "小黄8",
+    key: "hangxiao@axxx.com",
+    email: "hangxiao@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "小马9",
+    key: "maxiao@axxx.com",
+    email: "maxiao@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "前端"
+  },
+  {
+    title: "小胡10",
+    key: "huxiao@axxx.com",
+    email: "huxiao@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  },
+  {
+    title: "小睿12",
+    key: "ruiiao@axxx.com",
+    email: "ruiiao@axxx.com",
+    deptName: "技术部",
+    vwdutyName: "后端"
+  }
+];
+
 export default {
   name: "app",
   components: {
@@ -275,7 +355,7 @@ export default {
       targetKeys: [],
       tableLeftColumns,
       tableRightColumns,
-      tableDataSource,
+      tableDataSource: tableDataSource1,
       treeDataSource: treeData
     };
   },
@@ -289,6 +369,7 @@ export default {
         return this.$message.error("请选择数据！");
       }
       console.log("确认表格中选择的内容:", selectedRows);
+      this.targetKeys = [...selectedRows];
     },
     onSelectChange(selectedRow, selectedRowKey) {
       console.log("当前点击选择的内容:", selectedRow, selectedRowKey);
@@ -296,6 +377,12 @@ export default {
     // 菜单选择
     onTreeSelect(selectedKeys, info) {
       console.log("selected", selectedKeys, info);
+
+      if (selectedKeys[0] === "0-0-0-1") {
+        this.tableDataSource = tableDataSource1;
+      } else if (selectedKeys[0] === "0-0-0-2") {
+        this.tableDataSource = tableDataSource2;
+      }
       console.log(info.node.title);
     },
     paginationChange(e) {

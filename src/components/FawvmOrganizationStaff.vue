@@ -116,9 +116,7 @@ export default {
     }
   },
   watch: {
-    tableDataSource(val) {
-      console.log("Watch>>>>>>>tableDataSource=", val);
-    }
+    tableDataSource(val) {}
   },
   created() {
     this.selectedRowKeys = [...this.targetKeys];
