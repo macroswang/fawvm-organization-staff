@@ -59,6 +59,8 @@ import difference from "lodash/difference";
 export default {
   data() {
     return {
+      tempRowData: [],
+      selectedRow: [],
       selectedRowKeys: []
     };
   },
@@ -116,9 +118,12 @@ export default {
     }
   },
   watch: {
-    tableDataSource(val) {}
+    tableDataSource(val) {
+      this.tableDataSource = val;
+    }
   },
   created() {
+    this.tempRowData = [];
     this.selectedRowKeys = [...this.targetKeys];
   },
   methods: {
@@ -126,7 +131,15 @@ export default {
       this.$emit("handleSearch", this.partNo);
     },
     handleSelected() {
-      this.$emit("handleSelected", this.selectedRowKeys);
+      this.selectedRow = [];
+      this.selectedRowKeys.map(val => {
+        this.tempRowData.some(item => {
+          if (val === item.key) {
+            return this.selectedRow.push(item);
+          }
+        });
+      });
+      this.$emit("handleSelected", this.selectedRow);
     },
     onTreeSelect(selectedKeys, info) {
       this.$emit("onTreeSelect", selectedKeys, info);
@@ -137,6 +150,15 @@ export default {
     },
     onChange(nextTargetKeys) {
       this.selectedRowKeys = nextTargetKeys;
+      nextTargetKeys.map(val => {
+        this.tableDataSource.some(item => {
+          if (val === item.key) {
+            if (!this.tempRowData.includes(item)) {
+              return this.tempRowData.push(item);
+            }
+          }
+        });
+      });
     },
     getRowSelection({ selectedKeys, itemSelectAll, itemSelect }) {
       return {
