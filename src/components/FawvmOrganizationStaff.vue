@@ -131,6 +131,9 @@ export default {
     treeCurrentKey(val) {
       this.treeCurrentKey = val;
       this.initData();
+    },
+    targetKeys(val) {
+      console.log("watch>>>>>>>>targetKeys");
     }
   },
   created() {

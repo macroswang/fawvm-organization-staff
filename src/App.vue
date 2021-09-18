@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import orgJson from "./org.json";
 import Modal from "./components/Modal";
 import FawvmOrganizationStaff from "./components/FawvmOrganizationStaff";
 const tableLeftColumns = [
@@ -315,7 +316,10 @@ const tableDataSource2 = [
     email: "zhouxiao@axxx.com",
     deptName: "技术部",
     vwdutyName: "后端"
-  },
+  }
+];
+
+const tableDataSource3 = [
   {
     title: "小张6",
     key: "zhangxiao@axxx.com",
@@ -377,7 +381,7 @@ export default {
       tableRightColumns,
       tableDataSource: [],
       organizationVisible: false, // 人员树
-      treeDataSource: treeData
+      treeDataSource: orgJson
     };
   },
   created() {},
@@ -415,12 +419,14 @@ export default {
     },
     // 菜单选择
     onTreeSelect(selectedKeys, info) {
-      // console.log("selected", selectedKeys, info);
+      console.log("selected", selectedKeys, info);
       this.treeCurrentKey = selectedKeys[0];
-      if (selectedKeys[0] === "0-0-0-1") {
+      if (selectedKeys[0] === "11010000") {
         this.tableDataSource = tableDataSource1;
-      } else if (selectedKeys[0] === "0-0-0-2") {
+      } else if (selectedKeys[0] === "11020000") {
         this.tableDataSource = tableDataSource2;
+      } else if (selectedKeys[0] === "11040000") {
+        this.tableDataSource = tableDataSource3;
       }
       console.log(info.node.title);
     },
