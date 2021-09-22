@@ -1,7 +1,7 @@
 {
   "name": "fawvm-organization-staff",
   "description": "组织机构与人员管理前端UI",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "author": "macroswang@gmail.com",
   "license": "MIT",
   "private": false,

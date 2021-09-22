@@ -25,6 +25,7 @@ npm run build
         :table-right-columns="tableRightColumns"
         :target-keys="targetKeys"
         :table-data-source="tableDataSource"
+        :tree-expanded-keys="treeExpandedKeys"
         @onTreeSelect="onTreeSelect"
         @handleSearch="handleSearch"
         @handleSelected="handleSelected"
@@ -42,8 +43,15 @@ npm run build
 
  v1.0.7版本:
  新加入tree-current-key字段:此字段的作用是传入树的当前选中的节点KEY
+
  v1.0.8版本:
  修改BUG及数据回填优化
+
+ v1.0.9版本:
+ 增加treeExpandedKeys属性:设置树的展开结点,如果不设置,则默认展开第一级,值为结点的key值
+
+v1.0.10版本:
+ bug fix
 
  使用特别说明:
    由于Transfer 穿梭框组件对数据源有特别的要求:

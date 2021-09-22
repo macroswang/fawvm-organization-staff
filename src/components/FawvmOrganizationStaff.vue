@@ -6,6 +6,7 @@
         :show-line="treeShowLine"
         :tree-data="treeDataSource"
         @select="onTreeSelect"
+        :default-expanded-keys="treeExpandedKeys"
       >
       </a-tree>
     </div>
@@ -84,6 +85,10 @@ export default {
       type: Array,
       default: () => []
     },
+    treeExpandedKeys: {
+      type: Array,
+      default: () => []
+    },
     tableSize: {
       type: String,
       default: ""
@@ -115,6 +120,7 @@ export default {
           current: 1,
           total: 0, // 每页中显示数据的条数
           pageSize: 10, // 每页中显示5条数据
+
           showSizeChanger: true,
           pageSizeOptions: ["10", "20", "50", "100"], // 每页中显示的数据
           showTotal: total => `共有 ${total} 条数据` // 分页中显示总的数据
@@ -124,36 +130,32 @@ export default {
   },
   watch: {
     tableDataSource(val) {
-      this.wapperTableDataSource = val.map(item => {
-        return Object.assign(item, { pid: this.treeCurrentKey });
-      });
+      this.wapperTableDataSource =
+        val &&
+        val.map(item => {
+          return Object.assign(item, { pid: this.treeCurrentKey });
+        });
     },
     treeCurrentKey(val) {
       this.treeCurrentKey = val;
-      this.initData();
     },
     targetKeys(val) {
-      console.log("watch>>>>>>>>targetKeys");
+      val &&
+        val.map(item => {
+          if (item.pid === this.treeCurrentKey) {
+            this.selectedRowKeys.push(item.key);
+          }
+        });
     }
   },
   created() {
     this.tempRowData = [...this.targetKeys];
-    this.initData();
+    //默认展开第一级树
+    if (this.treeExpandedKeys && this.treeExpandedKeys.length === 0) {
+      this.treeExpandedKeys.push(this.treeDataSource[0].key);
+    }
   },
   methods: {
-    initData() {
-      if (this.tableDataSource) {
-        this.wapperTableDataSource = this.tableDataSource.map(item => {
-          return Object.assign(item, { pid: this.treeCurrentKey });
-        });
-        this.targetKeys &&
-          this.targetKeys.map(item => {
-            if (item.pid === this.treeCurrentKey) {
-              this.selectedRowKeys.push(item.key);
-            }
-          });
-      }
-    },
     handleSearch() {
       this.$emit("handleSearch", this.partNo);
     },
